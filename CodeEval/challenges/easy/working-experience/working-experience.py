@@ -1,30 +1,38 @@
 import sys
-import datetime
-import calendar
+
+MONTHS = {"Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3,
+          "May": 4, "Jun": 5, "Jul": 6, "Aug": 7,
+          "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11}
 
 
-def calculate_working_experience(dates):
-    dates.sort()
-    working_experience = list()
-    working_experience.append(dates[0])
-    for date_range in dates[1:]:
-        if dates_intersect(working_experience[-1], date_range):
-            working_experience[-1] = (min(working_experience[-1][0], date_range[0]), max(working_experience[-1][1], date_range[1]))
-        else:
-            working_experience.append(date_range)
+def update_calendar(calendar_to_update, from_month, from_year, to_month, to_year):
 
-    days_of_experience = 0
-    for experience in working_experience:
-        days_of_experience += (experience[1] - experience[0]).days
+    current_month = from_month
+    current_year = from_year
 
-    return days_of_experience / 365
+    while True:
+        calendar_to_update[current_year][current_month] = True
+        current_month += 1
 
-def dates_intersect(date1, date2):
-    if date1[0] <= date2[0]:
-        return date1[1] > date2[0]
-    else:
-        return date2[1] > date1[0]
+        if current_month >= 12:
+            current_month = 0
+            current_year += 1
 
+        if current_year == to_year and current_month == to_month:
+            calendar_to_update[current_year][current_month] = True
+            break
+
+    return calendar_to_update
+
+
+def calculate_working_experience(calendar):
+    months_of_experience = 0
+    for year in range(1990, 2021):
+        for month in range(0, 12):
+            if calendar[year][month]:
+                months_of_experience += 1
+
+    return months_of_experience/12
 
 
 test_cases = open(sys.argv[1], 'r')
@@ -33,16 +41,14 @@ for test in test_cases:
     if not test:
         continue
 
-    date_ranges = test.strip().split('; ')
-    dates = list()
-    for date_range in date_ranges:
+    test = test.strip()
+    calendar = {x: [False for y in range(0, 12)] for x in range(1990, 2021)}
+
+    for date_range in test.split("; "):
         from_date, to_date = date_range.split('-')
-        from_date = datetime.datetime.strptime(from_date, "%b %Y")
-        to_date = datetime.datetime.strptime(to_date, "%b %Y")
-        to_date = to_date.replace(day=calendar.monthrange(to_date.year, to_date.month)[1])
-        dates.append((from_date, to_date))
+        calendar = update_calendar(calendar, MONTHS[from_date.split(' ')[0]], int(from_date.split(' ')[1]),
+                                           MONTHS[to_date.split(' ')[0]], int(to_date.split(' ')[1]))
 
-    print(calculate_working_experience(dates))
-
+    print(calculate_working_experience(calendar))
 
 test_cases.close()
