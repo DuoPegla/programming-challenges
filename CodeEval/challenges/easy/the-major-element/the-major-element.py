@@ -1,19 +1,14 @@
 import sys
+from collections import Counter
 
 
 def major_element(sequence):
-    element_frequency = dict()
-    for element in sequence:
-        if element not in element_frequency.keys():
-            element_frequency[element] = 1
-        else:
-            element_frequency[element] += 1
+    count = Counter(sequence)
 
-    for key in element_frequency.keys():
-        if element_frequency[key] > float(len(sequence)) / 2:
-            return key
-
-    return 'None'
+    if count.most_common(1)[0][1] > (len(sequence)/2):
+        return count.most_common(1)[0][0]
+    else:
+        return 'None'
 
 test_cases = open(sys.argv[1], 'r')
 for test in test_cases:
