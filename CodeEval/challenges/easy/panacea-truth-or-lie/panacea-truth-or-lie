@@ -1,0 +1,27 @@
+import sys
+
+
+def test_antivirus(hexadecimals, binaries):
+    virus_sum = 0
+    for i in hexadecimals:
+        virus_sum += int(i, 16)
+
+    antivirus_sum = 0
+    for i in binaries:
+        antivirus_sum += int(i, 2)
+
+    return antivirus_sum >= virus_sum
+
+test_cases = open(sys.argv[1], 'r')
+for test in test_cases:
+
+    if not test:
+        continue
+
+    hexadecimals = test.strip().split(' | ')[0].split(' ')
+    binaries = test.strip().split(' | ')[1].split(' ')
+
+    print test_antivirus(hexadecimals, binaries)
+
+
+test_cases.close()
